@@ -1,5 +1,7 @@
 package com.it.acumen.acumeneventslocal;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,7 +14,8 @@ public class Game {
     private int round1Score;
     private int round2Score;
     private int round3Score;
-    private int status;
+    private int status; // 1 - Finished, 0 - Under Process
+    private String timeStamp;
 
     public Game(String gameId,List<PlayerDetails> playerList){
         this.gameId = gameId;
@@ -21,6 +24,7 @@ public class Game {
         this.round2Score = 0;
         this.round3Score = 0;
         this.status = 0;
+        this.timeStamp = DateFormat.getDateTimeInstance().format(new Date());
     }
 
     public String getGameId() {

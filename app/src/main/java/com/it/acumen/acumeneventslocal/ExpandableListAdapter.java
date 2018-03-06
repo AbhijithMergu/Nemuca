@@ -49,7 +49,8 @@ import static android.content.ContentValues.TAG;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private String result;
     private Context _context;
-    private List<String> _listDataHeader; // header titles
+    private List<String> _listDataHeader;
+    private static int playerId = 006;// header titles
     // child data in format of header title, child title
     private ArrayList<ViewGroup> parentList = new ArrayList<ViewGroup>();
     private HashMap<String, Game> _listDataChild;
@@ -92,7 +93,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         final View csView = convertView;
 
-        Toast.makeText(_context,"Group Position: "+groupPosition+"Number : "+childItem.getPlayerList().size(),Toast.LENGTH_SHORT).show();
+     //   Toast.makeText(_context,"Group Position: "+groupPosition+"Number : "+childItem.getPlayerList().size(),Toast.LENGTH_SHORT).show();
 
         final TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
@@ -284,7 +285,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     score2 =Integer.parseInt(R2.getText().toString());
                 if(R3.getText().toString().compareTo("")!=0)
                     score3 = Integer.parseInt(R3.getText().toString());
-
+                DataBaseHelper db = DataBaseHelper.getInstance(_context);
+                db.updateScore(getGroup(groupPosition).toString(),score1,score2,score3);
                 if(R1.isEnabled() && score1 != 0) {
                     childItem.setRound1Score(score1);
                     R1.setEnabled(false);
@@ -320,6 +322,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                                // String name = _listDataHeader.get(gPosition);
                                 //_listDataHeader.set(gPosition,"Submitted");
                                 childItem.setStatus(1);
+                                DataBaseHelper db = DataBaseHelper.getInstance(_context);
+                                db.updateStatus(getGroup(gPosition).toString());
                                 Toast.makeText(_context, "Submitted!!", Toast.LENGTH_SHORT).show();
                                 notifyDataSetChanged();
                             }
@@ -455,7 +459,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 int gp = data.getIntExtra("groupPosition",0);
                 String groupName = (String) getGroup(gp);
                 List<PlayerDetails> playerList=((Game)getChild(gp,0)).getPlayerList();
-                playerList.add(new PlayerDetails("98999898",result));
+
+                DataBaseHelper db = DataBaseHelper.getInstance(_context);
+                db.insertMemberPlayer(groupName,String.valueOf(playerId),result);
+                playerList.add(new PlayerDetails(String.valueOf(playerId),result));
                 //_listDataChild.get(groupName).getPlayerList().add(new PlayerDetails("6784848",result));
                 _listDataChild.get(groupName).setPlayerList(playerList);
                 notifyDataSetChanged();

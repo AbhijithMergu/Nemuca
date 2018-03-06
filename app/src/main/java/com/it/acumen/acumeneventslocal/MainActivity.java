@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.support.annotation.MainThread;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import android.app.Activity;
@@ -30,7 +33,7 @@ public class MainActivity extends Activity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, Game> listDataChild;
-
+    DataBaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,7 @@ public class MainActivity extends Activity {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, Game>();
 
+        db = new DataBaseHelper(getApplicationContext());
         prepareListData();
 
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
@@ -60,6 +64,7 @@ public class MainActivity extends Activity {
 
             }
         });
+        Toast.makeText(this,"View initialised",Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -68,25 +73,26 @@ public class MainActivity extends Activity {
     private void prepareListData() {
 
 
-        // Adding child data
-        listDataHeader.add("737-101 \t Sravya");
-        listDataHeader.add("737-073 \t Krushi");
-        listDataHeader.add("737-314 \t Bhavani");
+//        // Adding child data
+//        listDataHeader.add("737-101 \t Sravya");
+//        listDataHeader.add("737-073 \t Krushi");
+//        listDataHeader.add("737-314 \t Bhavani");
 
 
-        List<PlayerDetails> playerDetails = new ArrayList<>();
-        playerDetails.add(new PlayerDetails("player1","Abhijith"));
-        listDataChild.put(listDataHeader.get(0),new Game("12345",playerDetails));
+        db.insertGame("1", DateFormat.getDateTimeInstance().format(new Date()));
+        db.insertGame("2",DateFormat.getDateTimeInstance().format(new Date()));
+        db.insertGame("3",DateFormat.getDateTimeInstance().format(new Date()));
 
-        playerDetails = new ArrayList<>();
-        playerDetails.add(new PlayerDetails("player2","Abhijith2"));
-        listDataChild.put(listDataHeader.get(1),new Game("13454",playerDetails));
-
-        playerDetails = new ArrayList<>();
-        playerDetails.add(new PlayerDetails("player3","Abhijith3"));
-        listDataChild.put(listDataHeader.get(2),new Game("0876666",playerDetails));
+        db.insertHeadPlayer("1","001","Abhijith");
+        db.insertHeadPlayer("2","002","Abishek");
+        db.insertHeadPlayer("3","003","Aditya");
 
 
+        List<Game> gamesList = db.getAllGames();
+        for(int i=0;i<gamesList.size();i++){
+            listDataHeader.add(gamesList.get(i).getGameId()+" "+gamesList.get(i).getPlayerList().get(0));
+            listDataChild.put(gamesList.get(i).getGameId(),gamesList.get(i));
+        }
 
     }
     @Override
@@ -98,10 +104,15 @@ public class MainActivity extends Activity {
             if(resultCode == Activity.RESULT_OK){
                 String result=data.getStringExtra("result");
                 Toast.makeText(this,"Result :"+result,Toast.LENGTH_LONG).show();
+
+                db.insertGame(result,DateFormat.getDateTimeInstance().toString());
+
+             //   Game game = db.getAllGames().get();
                 listDataHeader.add(result);
+                db.insertHeadPlayer(result,"004","Akhil");
                 List<PlayerDetails> playerDetails = new ArrayList<>();
-                playerDetails.add(new PlayerDetails("player4","Abhijith4"));
-                listDataChild.put(result,new Game("12345",playerDetails));
+                playerDetails.add(new PlayerDetails("004","Akhil"));
+                listDataChild.put(result,new Game(result,playerDetails));
                 listAdapter.notifyDataSetChanged();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
